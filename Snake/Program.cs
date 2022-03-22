@@ -9,7 +9,11 @@ namespace Snake
     class Program
     {
         static int[,] matrix;
+        static int startX = 7;
+        static int startY = 11;
         static String option = "c";
+        static String color = "blue";
+        static int round = 0;
 
 
 
@@ -25,15 +29,15 @@ namespace Snake
 
         static void move()
         {
-            int x = 3;
-            int y = 5;
+            int x = startX/2;
+            int y = startY / 2;
             matrix[x, y] = 0;
             showMatrix();
 
 
             while (option != "p")
             {
-                Console.WriteLine("Keys WASD to move");
+                Console.WriteLine("Keys WASD to move // p to stop");
                 option = Console.ReadLine();
 
                 switch (option) 
@@ -81,8 +85,9 @@ namespace Snake
 
         static Boolean checkMovement(int x, int y)
         {
+            eventGenerator(x, y);
             Console.WriteLine(x+" "+y);
-            if (x < 0 || x >= 7 || y < 0 || y >= 10)
+            if (x < 0 || x >= startX || y < 0 || y >= startY)
             {
                 Console.WriteLine("Te chocas con un muro");
                 return false;
@@ -94,14 +99,38 @@ namespace Snake
 
                 return false;
             }
+            else if (matrix[x, y] == 8)
+            {
+                Console.WriteLine("Cambias de color");
+                
+                if (color=="blue")
+                {
+                    color = "green";
+                }else
+                {
+                    color = "blue";
+                }
+                
+                
+
+                return true;
+            }
+            else if (matrix[x, y] == 2)
+            {
+                Console.WriteLine("Has comido una bomba");
+                option = "p";
+
+                return false;
+            }
             else return true;
         }
         static void showMatrix()
         {
+            round++;
             if (matrix == null ) 
             {
 
-                matrix = new int[7, 10];
+                matrix = new int[startX, startY];
 
                 for (int i = 0; i < matrix.GetLength(0); i++)
                 {
@@ -119,12 +148,8 @@ namespace Snake
                     Console.WriteLine("");
                     for (int j = 0; j < matrix.GetLength(1); j++)
                     {
-
-                        if (matrix[i, j] == 0)
-                            Console.ForegroundColor = ConsoleColor.Red;
-                        else Console.ForegroundColor = ConsoleColor.White;
-                        Console.Write(matrix[i, j]);
-
+                        colorChange(i,j);
+                                             
                     }
                 }
                 Console.WriteLine(" ");
@@ -132,5 +157,60 @@ namespace Snake
             
             
         }
+        static void eventGenerator(int x, int y)
+        {
+            var rand = new Random();
+
+            if (round % 5 == 0)
+            {
+                int random = rand.Next(0, startX);
+                int random2 = rand.Next(0, startY);
+                Console.WriteLine("Round: " + round);
+                if (matrix[random, random2] == 4)
+                {
+                    matrix[random, random2] = 8;
+                }
+                else eventGenerator(x, y);
+                
+
+            }else if (round % 7 == 0)
+            {
+                int random = rand.Next(0, startX);
+                int random2 = rand.Next(0, startY);
+                Console.WriteLine("Round: " + round);
+                if (matrix[random, random2] == 4)
+                {
+                    matrix[random, random2] = 2;
+                }
+                else eventGenerator(x, y);
+            }
+        }
+        static void colorChange(int i, int j)
+        {
+            if (color == "green")
+            {
+                if (matrix[i, j] == 0)
+                    Console.ForegroundColor = ConsoleColor.Green;
+                else if (matrix[i, j] == 8)
+                    Console.ForegroundColor = ConsoleColor.Blue;
+                else if (matrix[i, j] == 2)
+                    Console.ForegroundColor = ConsoleColor.Red;
+                else Console.ForegroundColor = ConsoleColor.White;
+                Console.Write(matrix[i, j]);
+
+            }
+            else if (color == "blue")
+            {
+                if (matrix[i, j] == 0)
+                    Console.ForegroundColor = ConsoleColor.Blue;
+                else if (matrix[i, j] == 8)
+                    Console.ForegroundColor = ConsoleColor.Green;
+                else if (matrix[i, j] == 2)
+                    Console.ForegroundColor = ConsoleColor.Red;
+                else Console.ForegroundColor = ConsoleColor.White;
+                Console.Write(matrix[i, j]);
+            }
+        }
+        
     }
 }
